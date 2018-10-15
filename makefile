@@ -14,14 +14,14 @@ WARNING_FLAGS = -Wall -Wextra -lpthread
 EXE = prodcomm
 SCAN_BUILD_DIR = scan-build-out
   
-all: main.o queue.o
-    $(CC) -o $(EXE) main.o queue.o
+all: prodcomm.o Queue.o
+    $(CC) -o $(EXE) prodcomm.o Queue.o
 
-main.o: main.c queue.h
-    $(CC) $(WARNING_FLAGS) -c main.c
+main.o: prodcomm.c Queue.h
+    $(CC) $(WARNING_FLAGS) -c prodcomm.c
     
-queue.o: queue.c queue.h
-    $(CC) $(WARNING_FLAGS) -c queue.c
+queue.o: Queue.c Queue.h
+    $(CC) $(WARNING_FLAGS) -c Queue.c
     
 clean:
     rm -f $(EXE) *.o
