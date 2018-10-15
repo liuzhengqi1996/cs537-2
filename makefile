@@ -9,8 +9,8 @@
 # NetID:            mliu292, tzheng24
 #
 
-CC = gcc -lpthread
-WARNING_FLAGS = -Wall -Wextra
+CC = gcc
+WARNING_FLAGS = -Wall -Wextra -lpthread
 EXE = prodcomm
 SCAN_BUILD_DIR = scan-build-out
   
