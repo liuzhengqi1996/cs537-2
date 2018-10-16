@@ -15,7 +15,7 @@ EXE = prodcomm
 SCAN_BUILD_DIR = scan-build-out
 
 all: prodcomm.o Queue.o
-	$(CC) -o $(EXE) prodcomm.o Queue.o
+	$(CC) -o $(EXE) prodcomm.o Queue.o -lpthread
 
 prodcomm.o: prodcomm.c Queue.h
 	$(CC) $(WARNING_FLAGS) -c prodcomm.c
