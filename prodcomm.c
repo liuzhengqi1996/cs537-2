@@ -137,7 +137,7 @@ int main() {
 		fprintf(stderr, "%s\n", "Fail to join with a terminated thread4.");
 		exit(1);
 	}
-
+	
 	return 0;
 }
 
@@ -147,7 +147,7 @@ int main() {
  */
 void *Reader(void *ptr) {
 	struct Queue *q1 = (struct Queue *) malloc(sizeof(struct Queue*));
-	q1 = (struct Queue *)ptr;
+	q1 = (struct Queue *) ptr;
 	const int QUEUESIZE = 1024;
 	char *buffer = (char*) malloc(QUEUESIZE * sizeof(char));
 	if (buffer == NULL) {
@@ -174,6 +174,7 @@ void *Reader(void *ptr) {
 			pthread_exit(&retVal);
 		}
 	}
+	return 0;
 }
 
 /*
@@ -182,14 +183,17 @@ void *Reader(void *ptr) {
  * character strings
  */
 void *Munch1(void *ptr) {
-	struct transfer * we = (struct transfer*) malloc(sizeof(struct transfer*));
+	struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer*));
 	we = (struct transfer*) ptr;
-	struct Queue *q1 =( struct Queue*) malloc(sizeof(struct Queue*));
+	struct Queue *q1 = (struct Queue*) malloc(sizeof(struct Queue*));
 	struct Queue *q2 = (struct Queue*) malloc(sizeof(struct Queue*));
 	q1 = we -> p1;
 	q2 = we -> p2;
-
+	
 	char *string1 = DequeueString(q1);
+	while (q1 != NULL) {
+		string1 = DequeueString(q1);
+	}
 	
 	// When Munch1 dequeues a NULL from its input queue, it then enqueues the 
 	// NULL to its output queue and then does a pthread_exit
@@ -207,6 +211,7 @@ void *Munch1(void *ptr) {
 		}
 	}
 	EnqueueString(q2, string1);
+	return 0;
 }
 
 /*
@@ -220,9 +225,11 @@ void *Munch2(void *ptr) {
 	struct Queue *q3 = (struct Queue*) malloc(sizeof(struct Queue*));
 	q2 = we -> p1;
 	q3 = we -> p2;
-
-	char *string2 = DequeueString(q2);
 	
+	char *string2 = DequeueString(q2);
+	while (q2 != NULL) {
+		string2 = DequeueString(q2);
+	}
 	// When Munch2 dequeues a NULL from its input queue, it then enqueues the 
 	// NULL to its output queue and then does a pthread_exit
 	if (q2 == NULL) {
@@ -232,7 +239,6 @@ void *Munch2(void *ptr) {
 	}
 	
 	int n = strlen(string2);
-	int ret = 0;
 	// If there is a lower case letter, convert to its upper case form
 	for (int i = 0; i < n; i++) {
 		if (string2[i] >= 97 && string2[i] <= 122) {
@@ -240,6 +246,7 @@ void *Munch2(void *ptr) {
 		}
 	}
 	EnqueueString(q3, string2);
+	return 0;
 }
 
 /*
@@ -251,9 +258,11 @@ void *Writer(void *ptr) {
 	struct Queue *q1 = we -> p1;
 	struct Queue *q2 = we -> p2;
 	struct Queue *q3 = we -> p3;
-
-	char *string = DequeueString(q3);
 	
+	char *string = DequeueString(q3);
+	while (q3 != NULL) {
+		string = DequeueString(q3);
+	}
 	// When Writer dequeues a NULL from its input queue, it then enqueues the 
 	// NULL to its output queue and then does a pthread_exit
 	if (q3 == NULL) {
@@ -262,9 +271,15 @@ void *Writer(void *ptr) {
 		pthread_exit(&retVal);
 	}
 	
+	printf("%s", "q1 statistics: \n");
+	PrintQueueStats(q1);
+	printf("%s", "q2 statistics: \n");
+	PrintQueueStats(q2);
+	printf("%s", "q3 statistics: \n");
 	PrintQueueStats(q3);
 	printf("%s", string);
 	free(q1);
 	free(q2);
 	free(q3);
+	return 0;
 }

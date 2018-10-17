@@ -33,8 +33,12 @@ struct Queue *CreateStringQueue(int inputSize) {
 		exit(1);
 	}
 	
+	pthread_mutex_init(&Q -> Queue_lock, NULL);
+	pthread_cond_init(&Q -> cond_add, NULL);
+	pthread_cond_init(&Q -> cond_read, NULL);
+	
 	Q -> size = inputSize;
-	Q -> buffer = (char *) malloc(sizeof(char *)*Q -> size);
+	Q -> buffer = (char **) malloc(sizeof(char *)*Q -> size);
 	if (Q -> buffer == NULL) {
 		fprintf(stderr, "%s\n", "Cannot to allocate memory for Q -> buffer[Q -> size].");
 		exit(1);
@@ -78,6 +82,7 @@ void EnqueueString(struct Queue *q, char *string) {
 			exit(1);
 		}
 	}
+	printf("%s", "TEST: ENQUEUE A LINE\n");
 	q -> enqueueCount++;
 	q -> buffer[q -> last] = string;
 	q -> last = move(q -> last, q -> size);
@@ -123,6 +128,7 @@ char *DequeueString(struct Queue *q) {
 			exit(1);
 		}
 	}
+	printf("%s", "TEST: DEQUEUE A LINE\n");
 	q -> dequeueCount++;
 	char *out = q -> buffer[q -> first]; 
 	q -> first = move(q -> first, q -> size);

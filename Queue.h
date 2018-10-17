@@ -9,19 +9,20 @@
 // NetID:            mliu292, tzheng24
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <pthread.h>
+
 // Structure for the queue passed down between threads
 struct Queue {
 	// Variables for buffer
 	int size;
 	int first;
 	int last;
-	char ** buffer;
+	char **buffer;
 
 	// Variable for mutex and condition
 	pthread_mutex_t Queue_lock;
 	pthread_cond_t cond_add;
-	pthread_cond_t cond_read;
-	// A count of the number of strings enqueued on queue
+	pthread_cond_t cond_read;// A count of the number of strings enqueued on queue
 	int enqueueCount;
 	// A count of the number of strings dequeued on queue
 	int dequeueCount;
