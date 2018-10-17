@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#include <assert.h>
+//#include <assert.h>
 #include "Queue.h"
 
 extern Queue *CreateStringQueue(int inputSize);

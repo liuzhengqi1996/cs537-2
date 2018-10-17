@@ -9,7 +9,7 @@
 # NetID:            mliu292, tzheng24
 #
 
-CC = gcc -lpthread
+CC = gcc
 WARNING_FLAGS = -Wall -Wextra
 EXE = prodcomm
 SCAN_BUILD_DIR = scan-build-out
@@ -18,10 +18,10 @@ all: prodcomm.o Queue.o
 	$(CC) -o $(EXE) prodcomm.o Queue.o -lpthread
 
 prodcomm.o: prodcomm.c Queue.h
-	$(CC) $(WARNING_FLAGS) -c prodcomm.c
+	$(CC) $(WARNING_FLAGS) -c prodcomm.c -lpthread
 
 Queue.o: Queue.c Queue.h
-	$(CC) $(WARNING_FLAGS) -c Queue.c
+	$(CC) $(WARNING_FLAGS) -c Queue.c -lpthread
 
 clean:
 	rm -f $(EXE) *.o

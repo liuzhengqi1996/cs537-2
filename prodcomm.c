@@ -162,7 +162,7 @@ void *Reader(void *ptr) {
 	// remaining characters on that line
 	while ((limit = getline(&buffer, &len, stdin)) != -1) {
 		if (limit >= 0 && limit <= 1024) {
-			printf("%s %s\n", "Reader:", buffer);
+			printf("%s %s\n", "Reader enqueue:", buffer);
 			EnqueueString(q1, buffer);
 		} else {
 			fprintf(stderr, "%s\n", "Size of input exceeds buffer size.");
@@ -178,7 +178,8 @@ void *Reader(void *ptr) {
 	// pointer in its output queue, and then does a pthread_exit to terminate
 	// that thread.	
 	EnqueueString(q1, NULL);
-	int retVal = 100;
+	printf("%s\n", "Reader enqueue: NULL FOR EXIT");
+	int retVal = 0;
 	pthread_exit(&retVal);
 	
 	return 0;
@@ -192,14 +193,12 @@ void *Reader(void *ptr) {
 void *Munch1(void *ptr) {
 	struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer*));
 	we = (struct transfer*) ptr;
-	Queue *q1 = (Queue*) malloc(sizeof(Queue*));
-	Queue *q2 = (Queue*) malloc(sizeof(Queue*));
-	q1 = we -> p1;
-	q2 = we -> p2;
-	
+	Queue *q1 = we -> p1;
+	Queue *q2 = we -> p2;
+
 	char *string1 = DequeueString(q1);
 	while (string1 != NULL) {
-		
+		printf("%s %s\n", "Munch1 dequeue:", string1);
 		int n = strlen(string1);
 		for (int i = 0; i < n; i++) {
 			// Convert space character (not tabs or newlines) to asterisk character
@@ -207,17 +206,19 @@ void *Munch1(void *ptr) {
 				string1[i] = '*';
 			}
 		}
-		printf("%s %s\n", "Munch1:", string1);
+		printf("%s %s\n", "Munch1 enqueue:", string1);
 		EnqueueString(q2, string1);
 		
 		string1 = DequeueString(q1);
 	}
+	printf("%s %s\n", "Munch1 dequeue:", string1);
 	
 	// When Munch1 dequeues a NULL from its input queue, it then enqueues the 
 	// NULL to its output queue and then does a pthread_exit
 	if (string1 == NULL) {
 		EnqueueString(q2, NULL);
-		int retVal = 200;
+		printf("%s\n", "Munch1 enqueue: NULL FOR EXIT");
+		int retVal = 0;
 		pthread_exit(&retVal);
 	}
 	
@@ -231,15 +232,12 @@ void *Munch1(void *ptr) {
 void *Munch2(void *ptr) {
 	struct transfer * we = (struct transfer*) malloc(sizeof(struct transfer*));
 	we = (struct transfer*) ptr;
-	Queue *q2 = (Queue*) malloc(sizeof(Queue*));
-	Queue *q3 = (Queue*) malloc(sizeof(Queue*));
-	q2 = we -> p1;
-	q3 = we -> p2;
-	
+	Queue *q2 = we -> p1;
+	Queue *q3 = we -> p2;	
 
 	char *string2 = DequeueString(q2);
 	while (string2 != NULL) {
-		
+		printf("%s %s\n", "Munch2 dequeue:", string2);
 		int n = strlen(string2);
 		// If there is a lower case letter, convert to its upper case form
 		for (int i = 0; i < n; i++) {
@@ -247,17 +245,19 @@ void *Munch2(void *ptr) {
 				string2[i] = string2[i] - 32;
 			}
 		}
-		printf("%s %s\n", "Munch2:", string2);
+		printf("%s %s\n", "Munch2 enqueue:", string2);
 		EnqueueString(q3, string2);
 		
 		string2 = DequeueString(q2);
 	}
+	printf("%s %s\n", "Munch2 dequeue:", string2);
 	
 	// When Munch2 dequeues a NULL from its input queue, it then enqueues the 
 	// NULL to its output queue and then does a pthread_exit
 	if (string2 == NULL) {
 		EnqueueString(q3, NULL);
-		int retVal = 300;
+		printf("%s\n", "Munch2 dequeue: NULL FOR EXIT");
+		int retVal = 0;
 		pthread_exit(&retVal);
 	}
 	return 0;
@@ -275,9 +275,11 @@ void *Writer(void *ptr) {
 	
 	char *string = DequeueString(q3);
 	while (string != NULL) {
-		printf("%s %s\n", "Writer:", string);
+		printf("%s %s\n", "Writer dequeue:", string);
 		string = DequeueString(q3);
 	}
+	printf("%s %s\n", "Writer dequeue:", string);
+	
 	printf("%s", "q1 statistics: \n");
 	PrintQueueStats(q1);
 	printf("%s", "q2 statistics: \n");
@@ -287,7 +289,7 @@ void *Writer(void *ptr) {
 	
 	// When Writer dequeues a NULL from its input queue, it then does a pthread_exit
 	if (string == NULL) {
-		int retVal = 400;
+		int retVal = 0;
 		pthread_exit(&retVal);
 	}
 	//printf("%s", string);
