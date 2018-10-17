@@ -20,7 +20,7 @@ extern Queue *CreateStringQueue(int inputSize);
 extern void EnqueueString(Queue *q, char *string);
 extern char *DequeueString(Queue *q);
 extern void PrintQueueStats(Queue *q);
-extern int move(int v, int size);
+//extern int move(int v, int size);
 
 /*
  * CreateStringQueue - dynamically allocate a new Queue structure, initialize 
@@ -60,7 +60,7 @@ Queue *CreateStringQueue(int size) {
 	}
 	
 	Q -> first = Q -> last = 0;
-	//Q -> numIn = 0;
+	Q -> numIn = 0;
 	Q -> enqueueCount = Q -> dequeueCount = 0;
 	Q -> enqueueBlockCount = Q -> dequeueBlockCount = 0;
 	return Q;
@@ -69,11 +69,11 @@ Queue *CreateStringQueue(int size) {
 /*
  * move - move location inside buffer
  */
- 
+/* 
 int move(int v, int size) {
 	return (v + 1) % size;
 };
-
+*/
 
 /*
  * EnqueueString - place the pointer to the string at the end of queue q,
@@ -88,8 +88,8 @@ void EnqueueString(Queue *q, char *string) {
 	
 	int ret2 = -1;
 	//int ret3 = -1;
-	while(move(q -> last, q -> bufferSize) == q -> first) {
-	//while(q -> numIn >= q -> bufferSize) {
+	//while(move(q -> last, q -> bufferSize) == q -> first) {
+	while(q -> numIn >= q -> bufferSize) {
 		q -> enqueueBlockCount++;
 		ret2 = pthread_cond_wait(&q -> cond_add, &q -> Queue_lock);
 		if (ret2 != 0) {
@@ -105,13 +105,13 @@ void EnqueueString(Queue *q, char *string) {
 		*/
 	}
 	
-	q -> buffer[q -> last] = string;
-	q -> last = move(q -> last, q -> bufferSize);
+	//q -> buffer[q -> last] = string;
+	//q -> last = move(q -> last, q -> bufferSize);
 	
-	//assert(q -> numIn < q -> bufferSize);
-	//q -> buffer[q -> last++] = string;
-	//q -> numIn = q -> numIn % q -> bufferSize;
-	//q -> numIn++;
+	assert(q -> numIn < q -> bufferSize);
+	q -> buffer[q -> last++] = string;
+	q -> numIn = q -> numIn % q -> bufferSize;
+	q -> numIn++;
 	q -> enqueueCount++;
 	
 	int ret4 = pthread_cond_signal(&q -> cond_read);
@@ -141,8 +141,8 @@ char *DequeueString(Queue *q) {
 	
 	int ret2 = -1;
 	//int ret3 = -1;
-	while(q -> first == q -> last) {
-	//while(q -> numIn <= 0) {
+	//while(q -> first == q -> last) {
+	while(q -> numIn <= 0) {
 		q -> dequeueBlockCount++; 
 		ret2 = pthread_cond_wait(&q -> cond_read, &q -> Queue_lock);
 		if (ret2 != 0) {
@@ -158,13 +158,13 @@ char *DequeueString(Queue *q) {
 		*/
 	}
 	
-	char *out = q -> buffer[q -> first]; 
-	q -> first = move(q -> first, q -> bufferSize);
+	//char *out = q -> buffer[q -> first]; 
+	//q -> first = move(q -> first, q -> bufferSize);
 	
-	//assert(q -> numIn > 0);
-    //char *out = q -> buffer[q -> first++];
-    //q -> first = q -> first % q -> bufferSize;
-    //q -> numIn--;
+	assert(q -> numIn > 0);
+    char *out = q -> buffer[q -> first++];
+    q -> first = q -> first % q -> bufferSize;
+    q -> numIn--;
 	q -> dequeueCount++;
 	
 	int ret4 = pthread_cond_signal(&q -> cond_add);

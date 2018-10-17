@@ -17,7 +17,7 @@ typedef struct {
 	int bufferSize;
 	int first;
 	int last;
-	//int numIn;
+	int numIn;
 	char **buffer;
 
 	// Variable for mutex and condition
@@ -58,7 +58,7 @@ Queue *CreateStringQueue(int size);
  /*
  * move - move location inside buffer
  */
-int move(int v, int size);
+//int move(int v, int size);
 
 /*
  * EnqueueString - place the pointer to the string at the end of queue q,

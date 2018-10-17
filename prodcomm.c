@@ -25,13 +25,13 @@ void *Writer(void *ptr);
  * finish by calling pthread_join
  */
 int main() {
-	const int size = 10;
+	const int SIZE = 10;
 	// Queue for Reader and Munch1
-	struct Queue *q1 = CreateStringQueue(size);
+	Queue *q1 = CreateStringQueue(SIZE);
 	// Queue for Munch1 and Munch2
-	struct Queue *q2 = CreateStringQueue(size);
+	Queue *q2 = CreateStringQueue(SIZE);
 	// Queue for Munch2 and Writer
-	struct Queue *q3 = CreateStringQueue(size);
+	Queue *q3 = CreateStringQueue(SIZE);
 	
 	// Create 4 threads and pass each thread its queues to operate on
 	pthread_t thread1;
@@ -57,25 +57,25 @@ int main() {
 		exit(1);
 	}
 	
-	w1 -> p1 = (struct Queue*) malloc(sizeof(struct Queue));
+	w1 -> p1 = (Queue*) malloc(sizeof(Queue));
 	if (w1 -> p1 == NULL) {
 		fprintf(stderr, "%s\n", "Cannot to allocate memory for w1 -> p1.");
 		exit(1);
 	}
 	
-	w1 -> p2 = (struct Queue*) malloc(sizeof(struct Queue));
+	w1 -> p2 = (Queue*) malloc(sizeof(Queue));
 	if (w1 -> p2 == NULL) {
 		fprintf(stderr, "%s\n", "Cannot to allocate memory for w1 -> p2.");
 		exit(1);
 	}
 	
-	w2 -> p1 = (struct Queue*) malloc(sizeof(struct Queue));
+	w2 -> p1 = (Queue*) malloc(sizeof(Queue));
 	if (w2 -> p1 == NULL) {
 		fprintf(stderr, "%s\n", "Cannot to allocate memory for w2 -> p1.");
 		exit(1);
 	}
 	
-	w2 -> p2 = (struct Queue*) malloc(sizeof(struct Queue));
+	w2 -> p2 = (Queue*) malloc(sizeof(Queue));
 	if (w2 -> p2 == NULL) {
 		fprintf(stderr, "%s\n", "Cannot to allocate memory for w2 -> p2.");
 		exit(1);
@@ -146,8 +146,8 @@ int main() {
  * the input and pass it to thread Munch1 through a queue of character strings
  */
 void *Reader(void *ptr) {
-	struct Queue *q1 = (struct Queue *) malloc(sizeof(struct Queue*));
-	q1 = (struct Queue *) ptr;
+	Queue *q1 = (Queue *) malloc(sizeof(Queue*));
+	q1 = (Queue *) ptr;
 	const int QUEUESIZE = 1024;
 	char *buffer = (char*) malloc(QUEUESIZE * sizeof(char));
 	if (buffer == NULL) {
@@ -161,19 +161,26 @@ void *Reader(void *ptr) {
 	// by printing out an error message to stderr and throw away any 
 	// remaining characters on that line
 	while ((limit = getline(&buffer, &len, stdin)) != -1) {
-		if (limit >= 1024) {
+		if (limit >= 0 && limit <= 1024) {
+			printf("%s %s\n", "Reader:", buffer);
+			EnqueueString(q1, buffer);
+		} else {
 			fprintf(stderr, "%s\n", "Size of input exceeds buffer size.");
-				break;
-		}
-		EnqueueString(q1, buffer);
-		// When Reader detects end-of-file on its input, it then enqueues a NULL 
-		// pointer in its output queue, and then does a pthread_exit to terminate
-		// that thread.
-		if (q1 == NULL) {
-			int retVal = 100;
-			pthread_exit(&retVal);
 		}
 	}
+	/*
+	while (getline(&buffer, &len, stdin) != -1) {
+		printf("%s %s\n", "Reader:", buffer);
+		EnqueueString(q1, buffer);
+	}
+	*/
+	// When Reader detects end-of-file on its input, it then enqueues a NULL 
+	// pointer in its output queue, and then does a pthread_exit to terminate
+	// that thread.	
+	EnqueueString(q1, NULL);
+	int retVal = 100;
+	pthread_exit(&retVal);
+	
 	return 0;
 }
 
@@ -185,32 +192,35 @@ void *Reader(void *ptr) {
 void *Munch1(void *ptr) {
 	struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer*));
 	we = (struct transfer*) ptr;
-	struct Queue *q1 = (struct Queue*) malloc(sizeof(struct Queue*));
-	struct Queue *q2 = (struct Queue*) malloc(sizeof(struct Queue*));
+	Queue *q1 = (Queue*) malloc(sizeof(Queue*));
+	Queue *q2 = (Queue*) malloc(sizeof(Queue*));
 	q1 = we -> p1;
 	q2 = we -> p2;
 	
 	char *string1 = DequeueString(q1);
-	while (q1 != NULL) {
+	while (string1 != NULL) {
+		
+		int n = strlen(string1);
+		for (int i = 0; i < n; i++) {
+			// Convert space character (not tabs or newlines) to asterisk character
+			if (string1[i] == ' ' && string1[i] != '\t' && string1[i] != '\n') {
+				string1[i] = '*';
+			}
+		}
+		printf("%s %s\n", "Munch1:", string1);
+		EnqueueString(q2, string1);
+		
 		string1 = DequeueString(q1);
 	}
 	
 	// When Munch1 dequeues a NULL from its input queue, it then enqueues the 
 	// NULL to its output queue and then does a pthread_exit
-	if (q1 == NULL) {
-		EnqueueString(q1, string1);
+	if (string1 == NULL) {
+		EnqueueString(q2, NULL);
 		int retVal = 200;
 		pthread_exit(&retVal);
 	}
 	
-	int n = strlen(string1);
-	for (int i = 0; i < n; i++) {
-		// Convert space character (not tabs or newlines) to asterisk character
-		if (string1[i] == ' ' && string1[i] != '\t' && string1[i] != '\n') {
-			string1[i] = '*';
-		}
-	}
-	EnqueueString(q2, string1);
 	return 0;
 }
 
@@ -221,31 +231,35 @@ void *Munch1(void *ptr) {
 void *Munch2(void *ptr) {
 	struct transfer * we = (struct transfer*) malloc(sizeof(struct transfer*));
 	we = (struct transfer*) ptr;
-	struct Queue *q2 = (struct Queue*) malloc(sizeof(struct Queue*));
-	struct Queue *q3 = (struct Queue*) malloc(sizeof(struct Queue*));
+	Queue *q2 = (Queue*) malloc(sizeof(Queue*));
+	Queue *q3 = (Queue*) malloc(sizeof(Queue*));
 	q2 = we -> p1;
 	q3 = we -> p2;
 	
+
 	char *string2 = DequeueString(q2);
-	while (q2 != NULL) {
+	while (string2 != NULL) {
+		
+		int n = strlen(string2);
+		// If there is a lower case letter, convert to its upper case form
+		for (int i = 0; i < n; i++) {
+			if (string2[i] >= 97 && string2[i] <= 122) {
+				string2[i] = string2[i] - 32;
+			}
+		}
+		printf("%s %s\n", "Munch2:", string2);
+		EnqueueString(q3, string2);
+		
 		string2 = DequeueString(q2);
 	}
+	
 	// When Munch2 dequeues a NULL from its input queue, it then enqueues the 
 	// NULL to its output queue and then does a pthread_exit
-	if (q2 == NULL) {
-		EnqueueString(q2, string2);
+	if (string2 == NULL) {
+		EnqueueString(q3, NULL);
 		int retVal = 300;
 		pthread_exit(&retVal);
 	}
-	
-	int n = strlen(string2);
-	// If there is a lower case letter, convert to its upper case form
-	for (int i = 0; i < n; i++) {
-		if (string2[i] >= 97 && string2[i] <= 122) {
-			string2[i] = string2[i] - 32;
-		}
-	}
-	EnqueueString(q3, string2);
 	return 0;
 }
 
@@ -255,31 +269,31 @@ void *Munch2(void *ptr) {
 void *Writer(void *ptr) {
 	struct writertransfer *we = (struct writertransfer *) malloc(sizeof(struct writertransfer*));
 	we = (struct writertransfer*) ptr;
-	struct Queue *q1 = we -> p1;
-	struct Queue *q2 = we -> p2;
-	struct Queue *q3 = we -> p3;
+	Queue *q1 = we -> p1;
+	Queue *q2 = we -> p2;
+	Queue *q3 = we -> p3;
 	
 	char *string = DequeueString(q3);
-	while (q3 != NULL) {
+	while (string != NULL) {
+		printf("%s %s\n", "Writer:", string);
 		string = DequeueString(q3);
 	}
-	// When Writer dequeues a NULL from its input queue, it then enqueues the 
-	// NULL to its output queue and then does a pthread_exit
-	if (q3 == NULL) {
-		EnqueueString(q3, string);
-		int retVal = 400;
-		pthread_exit(&retVal);
-	}
-	
 	printf("%s", "q1 statistics: \n");
 	PrintQueueStats(q1);
 	printf("%s", "q2 statistics: \n");
 	PrintQueueStats(q2);
 	printf("%s", "q3 statistics: \n");
 	PrintQueueStats(q3);
-	printf("%s", string);
-	free(q1);
-	free(q2);
-	free(q3);
+	
+	// When Writer dequeues a NULL from its input queue, it then does a pthread_exit
+	if (string == NULL) {
+		int retVal = 400;
+		pthread_exit(&retVal);
+	}
+	//printf("%s", string);
+	
+	//free(q1);
+	//free(q2);
+	//free(q3);
 	return 0;
 }
