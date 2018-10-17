@@ -34,8 +34,8 @@ struct Queue *CreateStringQueue(int inputSize) {
 	}
 	
 	Q -> size = inputSize;
-	Q -> buffer[Q -> size] = (char *) malloc(sizeof(char *)*Q -> size);
-	if (Q -> buffer[Q -> size] == NULL) {
+	Q -> buffer = (char *) malloc(sizeof(char *)*Q -> size);
+	if (Q -> buffer == NULL) {
 		fprintf(stderr, "%s\n", "Cannot to allocate memory for Q -> buffer[Q -> size].");
 		exit(1);
 	}
