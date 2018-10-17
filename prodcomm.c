@@ -107,7 +107,7 @@ int main() {
 		exit(1);
 	}
 	
-	int ret4 = pthread_create(&thread4, NULL, Writer, (void*)q3);
+	int ret4 = pthread_create(&thread4, NULL, Writer, (void*)wt);
 	if (ret4 != 0) {
 		fprintf(stderr, "%s\n", "Fail to create thread4.");
 		exit(1);
