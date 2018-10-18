@@ -146,8 +146,6 @@ int main() {
  * the input and pass it to thread Munch1 through a queue of character strings
  */
 void *Reader(void *ptr) {
-	//Queue *q1 = (Queue *) malloc(sizeof(Queue*));
-	//q1 = (Queue *) ptr;
 	const int QUEUESIZE = 1024;
 	char *buffer = (char*) malloc(QUEUESIZE * sizeof(char));
 	if (buffer == NULL) {
