@@ -131,7 +131,8 @@ int main() {
 void *Reader(void *ptr) {
 	// Create buffer as an array of char* with constant size
 	const int QUEUESIZE = 1024;
-	char *buffer = (char*) malloc(QUEUESIZE * sizeof(char));
+	size_t len = 1;
+	char *buffer = (char*) calloc(len, QUEUESIZE * sizeof(char));
 	if (buffer == NULL) {
 		fprintf(stderr, "%s\n", "Cannot to allocate memory for buffer.");
 		exit(1);
@@ -139,7 +140,6 @@ void *Reader(void *ptr) {
 	
 	// Read standard input into buffer with limited length
 	int limit = 0;
-	size_t len = 1;
 	while ((limit = getline(&buffer, &len, stdin)) != -1) {
 		// If the input line is within the limit, enqueue the buffer to queue 1
 		if (limit >= 0 && limit <= 1024) {
