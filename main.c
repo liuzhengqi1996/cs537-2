@@ -163,11 +163,9 @@ void *Reader(void *ptr) {
 	while ((limit = getline(&buffer, &len, stdin)) != -1) {
 		if (limit >= 0 && limit <= 1024) {
 			EnqueueString(ptr, buffer);
-			//buffer = (char*) malloc(QUEUESIZE * sizeof(char));
 			buffer = (char*) calloc(len, QUEUESIZE * sizeof(char));
 		} else {
 			fprintf(stderr, "%s\n", "Size of input exceeds buffer size, skip a line.");
-			//buffer = (char*) malloc(QUEUESIZE * sizeof(char));
 			buffer = (char*) calloc(len, QUEUESIZE * sizeof(char));
 		}
 	}
