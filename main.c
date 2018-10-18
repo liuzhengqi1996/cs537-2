@@ -39,19 +39,19 @@ int main() {
 	pthread_t thread3;
 	pthread_t thread4;
 	
-	struct transfer *w1 = (struct transfer*) malloc(sizeof(struct transfer*));
+	struct transfer *w1 = (struct transfer*) malloc(sizeof(struct transfer));
 	if (w1 == NULL) {
 		fprintf(stderr, "%s\n", "Cannot to allocate memory for w1.");
 		exit(1);
 	}
 	
-	struct transfer *w2 = (struct transfer*) malloc(sizeof(struct transfer*));
+	struct transfer *w2 = (struct transfer*) malloc(sizeof(struct transfer));
 	if (w2 == NULL) {
 		fprintf(stderr, "%s\n", "Cannot to allocate memory for w2.");
 		exit(1);
 	}
 	
-	struct writertransfer *wt = (struct writertransfer*) malloc(sizeof(struct writertransfer*));
+	struct writertransfer *wt = (struct writertransfer*) malloc(sizeof(struct writertransfer));
 	if (wt == NULL) {
 		fprintf(stderr, "%s\n", "Cannot to allocate memory for w2.");
 		exit(1);
@@ -89,25 +89,25 @@ int main() {
 	wt -> p2 = q2;
 	wt -> p3 = q3;
 
-	int ret1 = pthread_create(&thread1, NULL, Reader, (void*)q1);
+	int ret1 = pthread_create(&thread1, NULL, Reader, (void*) q1);
 	if (ret1 != 0) {
 		fprintf(stderr, "%s\n", "Fail to create thread1.");
 		exit(1);
 	}
 	
-	int ret2 = pthread_create(&thread2, NULL, Munch1, (void*)w1);
+	int ret2 = pthread_create(&thread2, NULL, Munch1, (void*) w1);
 	if (ret2 != 0) {
 		fprintf(stderr, "%s\n", "Fail to create thread2.");
 		exit(1);
 	}
 	
-	int ret3 = pthread_create(&thread3, NULL, Munch2, (void*)w2);
+	int ret3 = pthread_create(&thread3, NULL, Munch2, (void*) w2);
 	if (ret3 != 0) {
 		fprintf(stderr, "%s\n", "Fail to create thread3.");
 		exit(1);
 	}
 	
-	int ret4 = pthread_create(&thread4, NULL, Writer, (void*)wt);
+	int ret4 = pthread_create(&thread4, NULL, Writer, (void*) wt);
 	if (ret4 != 0) {
 		fprintf(stderr, "%s\n", "Fail to create thread4.");
 		exit(1);
@@ -184,7 +184,7 @@ void *Reader(void *ptr) {
  * character strings
  */
 void *Munch1(void *ptr) {
-	struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer*));
+	struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer));
 	we = (struct transfer*) ptr;
 	Queue *q1 = we -> p1;
 	Queue *q2 = we -> p2;
@@ -220,7 +220,7 @@ void *Munch1(void *ptr) {
  * then pass the line to thread Writer though a queue of character strings
  */
 void *Munch2(void *ptr) {
-	struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer*));
+	struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer));
 	we = (struct transfer*) ptr;
 	Queue *q2 = we -> p1;
 	Queue *q3 = we -> p2;	
@@ -255,7 +255,7 @@ void *Munch2(void *ptr) {
  * Writer - write the line to standard output
  */
 void *Writer(void *ptr) {
-	struct writertransfer *we = (struct writertransfer *) malloc(sizeof(struct writertransfer*));
+	struct writertransfer *we = (struct writertransfer *) malloc(sizeof(struct writertransfer));
 	we = (struct writertransfer*) ptr;
 	Queue *q1 = we -> p1;
 	Queue *q2 = we -> p2;
