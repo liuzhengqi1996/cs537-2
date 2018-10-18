@@ -1,0 +1,3 @@
+student,full name (as in Canvas),Net ID,CS ID,wisc email (not CS email),campus ID number
+1,Zhengqi Liu,mliu292,zhengqi,mliu292@wisc.edu,9077409978
+2,Tian Zheng,tzheng24,tian,tzheng24@wisc.edu,9070008967

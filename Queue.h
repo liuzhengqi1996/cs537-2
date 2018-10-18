@@ -11,7 +11,7 @@
 
 #include <pthread.h>
 
-// Structure for the queue passed down between threads
+// Structure for the queue passed to threads
 typedef struct Queue{
 	// Variables for buffer
 	int bufferSize;
@@ -21,8 +21,8 @@ typedef struct Queue{
 
 	// Variable for mutex and condition
 	pthread_mutex_t Queue_lock;
-	pthread_cond_t cond_add;
-	pthread_cond_t cond_read;
+	pthread_cond_t cond_full;
+	pthread_cond_t cond_empty;
 	
 	// A count of the number of strings enqueued on queue
 	int enqueueCount;
@@ -55,7 +55,7 @@ struct writertransfer{
 Queue *CreateStringQueue(int size);
 
  /*
- * move - move location inside buffer
+ * move - move location inside queue
  */
 int move(int v, int size);
 
