@@ -184,8 +184,8 @@ void *Reader(void *ptr) {
  * character strings
  */
 void *Munch1(void *ptr) {
-	struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer));
-	we = (struct transfer*) ptr;
+	//struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer));
+	struct transfer * we = (struct transfer*) ptr;
 	Queue *q1 = we -> p1;
 	Queue *q2 = we -> p2;
 
@@ -220,8 +220,8 @@ void *Munch1(void *ptr) {
  * then pass the line to thread Writer though a queue of character strings
  */
 void *Munch2(void *ptr) {
-	struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer));
-	we = (struct transfer*) ptr;
+	//struct transfer *we = (struct transfer*) malloc(sizeof(struct transfer));
+	struct transfer * we = (struct transfer*) ptr;
 	Queue *q2 = we -> p1;
 	Queue *q3 = we -> p2;	
 
@@ -255,8 +255,8 @@ void *Munch2(void *ptr) {
  * Writer - write the line to standard output
  */
 void *Writer(void *ptr) {
-	struct writertransfer *we = (struct writertransfer *) malloc(sizeof(struct writertransfer));
-	we = (struct writertransfer*) ptr;
+	//struct writertransfer *we = (struct writertransfer *) malloc(sizeof(struct writertransfer));
+	struct writertransfer * we = (struct writertransfer*) ptr;
 	Queue *q1 = we -> p1;
 	Queue *q2 = we -> p2;
 	Queue *q3 = we -> p3;
@@ -269,6 +269,7 @@ void *Writer(void *ptr) {
 			
 		}
 		printf("%s", string);
+		free(string);
 	}
 	
 	printf("\n%s", "q1 statistics: \n");
