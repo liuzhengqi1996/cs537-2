@@ -1,0 +1,28 @@
+Course: CS 537
+Program: Shared Memory Producer/Consumer Program
+Instructor: Barton Miller
+Semester: Fall 2018
+Lecture: Lec 001
+Authors: Zhengqi Liu, Tian Zheng
+CS Login: zhengqi, tian
+NetID: mliu292, tzheng24
+
+This program runs in parallel on Linux using four threads (pthreads) and 
+synchronization for Reader, Munch1, Munch2, and Writer.
+
+This program is divided into two modules.
+
+The main module creates three queues and four pthread threads, pass each thread
+its queues to operate on, and wait for threads to finish by calling pthread_join.
+It also includes the functions of Reader, Munch1, Munch2, and Writer.
+The Reader thread reads from standard input, one line at a time, and pass it to
+thread Munch1 through a queue.
+Munch1 scans the line and replaces each space character with an asterisk ("*") 
+character, then pass the line to thread Munch2 through another queue.
+Munch2 scans the line and converts all lower case letters to upper case, then 
+pass the line to thread Writer though another queue.
+Writer writes the line to standard output.
+
+The Queue module includes the functions that handles creating a queue, moving a
+location inside a queue, enqueuing a string to the end of a queue, dequeuing a
+string from the beginning of a queue, and printing queue statistics.
