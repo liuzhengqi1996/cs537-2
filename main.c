@@ -158,6 +158,7 @@ void *Reader(void *ptr) {
 	// it then enqueues a NULL pointer in its output queue, queue 1, and 
 	// then does a pthread_exit to terminate the thread
 	EnqueueString(ptr, NULL);
+	free(buffer);
 	int retVal = 0;
 	pthread_exit(&retVal);
 	return 0;
@@ -170,30 +171,31 @@ void *Reader(void *ptr) {
  */
 void *Munch1(void *ptr) {
 	// Get queue 1 and queue 2 from input transfer structure
-	struct transfer * we = (struct transfer*) ptr;
+	struct transfer *we = (struct transfer*) ptr;
 	Queue *q1 = we -> p1;
 	Queue *q2 = we -> p2;
 	
 	// Dequeue string from queue 1
-	char *string1 = DequeueString(q1);
+	char *string = DequeueString(q1);
 	// When Munch1 dequeues a non-null string, it processes the line to convert
 	// it and enqueue the string to queue 2
-	while (string1 != NULL) {
-		int n = strlen(string1);
+	while (string != NULL) {
+		int n = strlen(string);
 		for (int i = 0; i < n; i++) {
 			// Convert space character (not tabs or newlines) to asterisk character
-			if (string1[i] == ' ' && string1[i] != '\t' && string1[i] != '\n') {
-				string1[i] = '*';
+			if (string[i] == ' ' && string[i] != '\t' && string[i] != '\n') {
+				string[i] = '*';
 			}
 		}
-		EnqueueString(q2, string1);
-		string1 = DequeueString(q1);
+		EnqueueString(q2, string);
+		string = DequeueString(q1);
 	}
 	
 	// When Munch1 dequeues a NULL (get out of while loop) from its input queue,
 	// queue 1, it then enqueues the NULL to its output queue, queue 2, 
 	// and then does a pthread_exit
 	EnqueueString(q2, NULL);
+	free(string);
 	free(we);
 	int retVal = 0;
 	pthread_exit(&retVal);
@@ -206,30 +208,31 @@ void *Munch1(void *ptr) {
  */
 void *Munch2(void *ptr) {
 	// Get queue 2 and queue 3 from input transfer structure
-	struct transfer * we = (struct transfer*) ptr;
+	struct transfer *we = (struct transfer*) ptr;
 	Queue *q2 = we -> p1;
 	Queue *q3 = we -> p2;	
 
 	// Dequeue string from queue 2
-	char *string2 = DequeueString(q2);
+	char *string = DequeueString(q2);
 	// When Munch2 dequeues a non-null string, it processes the line to convert
 	// it and enqueue the string to queue 3
-	while (string2 != NULL) {
-		int n = strlen(string2);
+	while (string != NULL) {
+		int n = strlen(string);
 		// If there is a lower case letter, convert to its upper case form
 		for (int i = 0; i < n; i++) {
-			if (string2[i] >= 97 && string2[i] <= 122) {
-				string2[i] = string2[i] - 32;
+			if (string[i] >= 97 && string[i] <= 122) {
+				string[i] = string[i] - 32;
 			}
 		}
-		EnqueueString(q3, string2);
-		string2 = DequeueString(q2);
+		EnqueueString(q3, string);
+		string = DequeueString(q2);
 	}
 	
 	// When Munch2 dequeues a NULL (get out of while loop) from its input queue,
 	// queue 2, it then enqueues the NULL to its output queue, queue 3, and then
 	// does a pthread_exit
 	EnqueueString(q3, NULL);
+	free(string);
 	free(we);
 	int retVal = 0;
 	pthread_exit(&retVal);
@@ -241,7 +244,7 @@ void *Munch2(void *ptr) {
  */
 void *Writer(void *ptr) {
 	// Get queue 1, 2 and queue 3 from input transfer structure
-	struct writertransfer * we = (struct writertransfer*) ptr;
+	struct writertransfer *we = (struct writertransfer*) ptr;
 	Queue *q1 = we -> p1;
 	Queue *q2 = we -> p2;
 	Queue *q3 = we -> p3;
